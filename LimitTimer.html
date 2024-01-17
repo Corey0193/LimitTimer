@@ -213,185 +213,144 @@
 
     <script>
         var countdownElement = document.getElementById('countdown');
-        var hoursElement = document.getElementById('hours');
-        var minutesElement = document.getElementById('minutes');
-        var secondsElement = document.getElementById('seconds');
-        var settingsElement = document.getElementById('settings');
-        var toggleSettingsButton = document.getElementById('toggle-settings');
-        var fontSizeElement = document.getElementById('font-size');
-        var colorElement = document.getElementById('color');
-        var backgroundColorElement = document.getElementById('background-color');
-        var boldElement = document.getElementById('bold');
-        var countdown;
-        var isTimerRunning = false; 
-        var time; 
-        var blinkInterval;
-        var startTime;
-        var targetEndTime;
+var hoursElement = document.getElementById('hours');
+var minutesElement = document.getElementById('minutes');
+var secondsElement = document.getElementById('seconds');
+var settingsElement = document.getElementById('settings');
+var toggleSettingsButton = document.getElementById('toggle-settings');
+var fontSizeElement = document.getElementById('font-size');
+var colorElement = document.getElementById('color');
+var backgroundColorElement = document.getElementById('background-color');
+var boldElement = document.getElementById('bold');
+var countdown = null;
+var isTimerRunning = false;
 
-        hoursElement.addEventListener('change', updateTimerDisplay);
-        minutesElement.addEventListener('change', updateTimerDisplay);
-        secondsElement.addEventListener('change', updateTimerDisplay);
+hoursElement.addEventListener('change', updateTimerDisplay);
+minutesElement.addEventListener('change', updateTimerDisplay);
+secondsElement.addEventListener('change', updateTimerDisplay);
 
-        function updateTimerDisplay() {
-            var hours = Number(hoursElement.value);
-            var minutes = Number(minutesElement.value);
-            var seconds = Number(secondsElement.value);
-            countdownElement.innerHTML = (hours < 10 ? "0" : "") + hours + ":" + (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
-        }
+function updateTimerDisplay() {
+    var hours = Number(hoursElement.value);
+    var minutes = Number(minutesElement.value);
+    var seconds = Number(secondsElement.value);
+    countdownElement.innerHTML = (hours < 10 ? "0" : "") + hours + ":" + (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+}
 
-        function toggleSettings() {
-            settingsElement.classList.toggle('show');
-            if (settingsElement.classList.contains('show')) {
-                toggleSettingsButton.textContent = '-';
-            } else {
-                toggleSettingsButton.textContent = '+';
-            }
-        }
+function toggleSettings() {
+    settingsElement.classList.toggle('show');
+    toggleSettingsButton.textContent = settingsElement.classList.contains('show') ? '-' : '+';
+}
 
-        function startCountdown() {
-            // If the timer is already running, don't start a new countdown
-            if (isTimerRunning) {
-                return;
-            }
+function startCountdown() {
+    if (isTimerRunning) {
+        return;
+    }
 
-            var hours = Number(hoursElement.value);
-            var minutes = Number(minutesElement.value);
-            var seconds = Number(secondsElement.value);
-            var endTime = new Date().getTime() + ((hours * 3600 + minutes * 60 + seconds) * 1000);
-            isTimerRunning = true;
+    var hours = Number(hoursElement.value);
+    var minutes = Number(minutesElement.value);
+    var seconds = Number(secondsElement.value);
+    var endTime = new Date().getTime() + ((hours * 3600 + minutes * 60 + seconds) * 1000);
+    isTimerRunning = true;
 
-            function updateTimer() {
-                var now = new Date().getTime();
-                var distance = endTime - now;
+    countdown = setInterval(function() {
+        var now = new Date().getTime();
+        var distance = endTime - now;
 
-                if(distance <= 0) {
-                    clearInterval(countdown);
-                    countdown = null;
-                    countdownElement.innerHTML = "00:00:00";
-                } else {
-                    var remainingHours = Math.floor(distance / (1000 * 60 * 60));
-                    var remainingMinutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                    var remainingSeconds = Math.floor((distance % (1000 * 60)) / 1000);
-                    countdownElement.innerHTML = (remainingHours < 10 ? "0" : "") + remainingHours + ":" + (remainingMinutes < 10 ? "0" : "") + remainingMinutes + ":" + (remainingSeconds < 10 ? "0" : "") + remainingSeconds;
-
-                    // Schedule next update
-                    var nextUpdate = 1000 - (new Date().getTime() % 1000);
-                    setTimeout(updateTimer, nextUpdate);
-                }
-            }
-
-            // Start the first update
-            updateTimer();
-        
-
-
-            // disable the timer inputs and enable the stop button
-            hoursElement.disabled = true;
-            minutesElement.disabled = true;
-            secondsElement.disabled = true;
-            document.getElementById('stop-button').disabled = false;
-
-            settingsElement.classList.remove('show');
-            toggleSettingsButton.textContent = '+';
-        }
-
-        function stopCountdown() {
-            clearInterval(countdown); 
+        if (distance <= 0) {
+            clearInterval(countdown);
+            countdown = null;
             isTimerRunning = false;
-
-            // reset the timer to 0
-            hoursElement.value = 0;
-            minutesElement.value = 0;
-            secondsElement.value = 0;
             countdownElement.innerHTML = "00:00:00";
-
-            // enable the timer inputs and disable the stop button
-            hoursElement.disabled = false;
-            minutesElement.disabled = false;
-            secondsElement.disabled = false;
-            document.getElementById('stop-button').disabled = true;
+        } else {
+            var remainingHours = Math.floor(distance / (1000 * 60 * 60));
+            var remainingMinutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            var remainingSeconds = Math.floor((distance % (1000 * 60)) / 1000);
+            countdownElement.innerHTML = (remainingHours < 10 ? "0" : "") + remainingHours + ":" + (remainingMinutes < 10 ? "0" : "") + remainingMinutes + ":" + (remainingSeconds < 10 ? "0" : "") + remainingSeconds;
         }
+    }, 1000);
 
-        fontSizeElement.addEventListener('change', function() {
-            countdownElement.style.fontSize = this.value + 'pt';
-        });
+    hoursElement.disabled = true;
+    minutesElement.disabled = true;
+    secondsElement.disabled = true;
+    document.getElementById('stop-button').disabled = false;
 
-        window.onload = function() {
-            countdownElement.style.fontSize = fontSizeElement.value + 'pt';
+    settingsElement.classList.remove('show');
+    toggleSettingsButton.textContent = '+';
+}
+
+function stopCountdown() {
+    clearInterval(countdown);
+    countdown = null;
+    isTimerRunning = false;
+
+    hoursElement.value = 0;
+    minutesElement.value = 0;
+    secondsElement.value = 0;
+    updateTimerDisplay();
+
+    hoursElement.disabled = false;
+    minutesElement.disabled = false;
+    secondsElement.disabled = false;
+    document.getElementById('stop-button').disabled = true;
+}
+
+fontSizeElement.addEventListener('change', function() {
+    countdownElement.style.fontSize = this.value + 'pt';
+});
+
+colorElement.addEventListener('input', function() {
+    countdownElement.style.color = this.value;
+});
+
+boldElement.addEventListener('change', function() {
+    countdownElement.style.fontWeight = this.checked ? 'bold' : 'normal';
+});
+
+backgroundColorElement.addEventListener('input', function() {
+    document.body.style.backgroundColor = this.value;
+});
+
+var warningIndicatorElement = document.getElementById('warning-indicator');
+var blinkInterval;
+
+window.addEventListener('keydown', function(event) {
+    var shortcutsEnabled = document.getElementById('keyboard-shortcuts').checked;
+
+    if (event.code === 'Space' && shortcutsEnabled) {
+        if (isTimerRunning) {
+            stopCountdown();
+        } else {
+            startCountdown();
         }
+    } else if ((event.key === 's' || event.key === 'S') && shortcutsEnabled) {
+        stopCountdown();
+    } else if ((event.key === 'w' || event.key === 'W') && shortcutsEnabled) {
+        if (warningIndicatorElement.style.display === 'none' || warningIndicatorElement.style.display === '') {
+            warningIndicatorElement.style.display = 'block';
+            blinkInterval = setInterval(function() {
+                warningIndicatorElement.style.opacity = warningIndicatorElement.style.opacity === '0' ? '1' : '0';
+            }, 1000);
+        } else {
+            warningIndicatorElement.style.display = 'none';
+            clearInterval(blinkInterval);
+        }
+    }
+});
 
-        colorElement.addEventListener('input', function() {
-            countdownElement.style.color = this.value;
-        });
+document.getElementById('fullscreen-button').addEventListener('click', function() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+    } else if (document.exitFullscreen) {
+        document.exitFullscreen();
+    }
+});
 
-        boldElement.addEventListener('change', function() {
-            countdownElement.style.fontWeight = this.checked ? 'bold' : 'normal';
-        });
-
-        backgroundColorElement.addEventListener('input', function() {
-            document.body.style.backgroundColor = this.value;
-        });
-
-        window.onload = function() {
-            countdownElement.style.fontSize = fontSizeElement.value + 'pt';
-            countdownElement.style.color = colorElement.value;
-            document.body.style.backgroundColor = backgroundColorElement.value;
-        };
-
-        var warningHoursElement = document.getElementById('warning-hours');
-        var warningMinutesElement = document.getElementById('warning-minutes');
-        var warningSecondsElement = document.getElementById('warning-seconds');
-        var warningIndicatorElement = document.getElementById('warning-indicator');
-
-        // Removed checkWarningTime function and setInterval
-
-        var warningColorElement = document.getElementById('warning-color');
-
-        warningColorElement.addEventListener('input', function() {
-            document.getElementById('warning-indicator').style.backgroundColor = this.value;
-        });
-
-        // Add a flag to keep track of whether the warning indicator is showing
-        var isWarningShowing = false;
-
-        window.addEventListener('keydown', function(event) {
-            var shortcutsEnabled = document.getElementById('keyboard-shortcuts').checked;
-
-            if (event.code === 'Space') {
-                if (shortcutsEnabled) {
-                    startCountdown();
-                }
-            } else if (event.key === 's' || event.key === 'S') {
-                if (shortcutsEnabled) {
-                    stopCountdown();
-                }
-            } else if (event.key === 'w' || event.key === 'W') {
-                console.log("'W' key pressed"); // Add this line
-                if (isWarningShowing) {
-                    warningIndicatorElement.style.display = 'none';
-                    clearInterval(blinkInterval);
-                    isWarningShowing = false;
-                } else {
-                    warningIndicatorElement.style.display = 'block';
-                    clearInterval(blinkInterval);
-                    blinkInterval = setInterval(function() {
-                        warningIndicatorElement.style.opacity = (warningIndicatorElement.style.opacity == 0 ? 1 : 0);
-                    }, 1000);
-                    isWarningShowing = true;
-                }
-            }
-        });
-
-        document.getElementById('fullscreen-button').addEventListener('click', function() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen();
-            } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen(); 
-                }
-            }
-        });
+window.onload = function() {
+    countdownElement.style.fontSize = fontSizeElement.value + 'pt';
+    countdownElement.style.color = colorElement.value;
+    document.body.style.backgroundColor = backgroundColorElement.value;
+    document.getElementById('stop-button').disabled = true;
+};
 
 </script>
 </body>
