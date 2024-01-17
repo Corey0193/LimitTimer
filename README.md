@@ -1,3 +1,3 @@
-Just open the file.
+Just open the HTML file.
 
 Enjoy :)
