@@ -175,7 +175,7 @@
         <div id="appearance-settings">
             <div>
                 <label for="font-size">Font Size:</label>
-                <input type="number" id="font-size" min="8" max="200" value="60">
+                <input type="number" id="font-size" min="8" max="200" value="69">
             </div>
             <div>
                 <label for="bold">Bold:</label>
@@ -250,13 +250,18 @@
         }
 
         function startCountdown() {
+            // If the timer is already running, don't start a new countdown
+            if (isTimerRunning) {
+                return;
+            }
+
             var hours = Number(hoursElement.value);
             var minutes = Number(minutesElement.value);
             var seconds = Number(secondsElement.value);
             var endTime = new Date().getTime() + ((hours * 3600 + minutes * 60 + seconds) * 1000);
             isTimerRunning = true;
 
-            countdown = setInterval(function() {
+            function updateTimer() {
                 var now = new Date().getTime();
                 var distance = endTime - now;
 
@@ -269,8 +274,17 @@
                     var remainingMinutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                     var remainingSeconds = Math.floor((distance % (1000 * 60)) / 1000);
                     countdownElement.innerHTML = (remainingHours < 10 ? "0" : "") + remainingHours + ":" + (remainingMinutes < 10 ? "0" : "") + remainingMinutes + ":" + (remainingSeconds < 10 ? "0" : "") + remainingSeconds;
+
+                    // Schedule next update
+                    var nextUpdate = 1000 - (new Date().getTime() % 1000);
+                    setTimeout(updateTimer, nextUpdate);
                 }
-            }, 1000);
+            }
+
+            // Start the first update
+            updateTimer();
+        
+
 
             // disable the timer inputs and enable the stop button
             hoursElement.disabled = true;
