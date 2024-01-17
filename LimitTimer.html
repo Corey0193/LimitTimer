@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Countdown Timer</title>
+    <style>
+        body {
+            background-color: black;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: red;
+            font-size: 3em;
+            text-align: center;
+        }
+        #logo {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 100px; /* adjust as needed */
+        }
+        #settings {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        #settings.show {
+            transform: translateY(0);
+        }
+
+        #settings div {
+            margin-bottom: 5px;
+        }
+
+        #settings label {
+            display: inline-block;
+            /* width: 100px; remove this line */
+            font-weight: normal;
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            margin-right: 2px;
+        }
+
+        .timer-label {
+            font-size: 14px;
+        }
+
+        #settings input[type="number"] {
+            width: 50px; /* adjust as needed */
+        }
+
+        #toggle-settings {
+            position: absolute;
+            top: -30px; /* adjust as needed */
+            right: 10px;
+            background: #333;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between; /* adjust as needed */
+            align-items: center; /* vertically align the buttons */
+        }
+
+        #toggle-settings.show {
+            color: #ff0000; /* change to a color that contrasts with the settings menu background */
+        }
+
+        #countdown {
+            font-size: 69pt;
+            font-family: 'Courier New', monospace;
+        }
+
+        #appearance-settings {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 90%; /* adjust as needed */
+            margin: 0 auto;
+        }
+
+        #start-button {
+            padding: 10px 20px;
+            background-color: green;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        #start-button:hover {
+            background-color: #008000; /* slightly darker green on hover */
+        }
+
+        #stop-button {
+            padding: 10px 20px;
+            background-color: #ff0000;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        #stop-button:hover {
+            background-color: #cc0000; /* slightly darker red on hover */
+        }
+        #logo {
+            background-color: #000000;
+            padding: 10px; /* adjust as needed */
+            width: 100px; /* adjust as needed */
+            height: auto; /* maintain aspect ratio */
+        }
+        #warning-indicator {
+            position: absolute;
+            top: 100px;
+            right: 100px;
+            width: 175px;
+            height: 175px;
+            background-color: red;
+            border-radius: 50%;
+            display: none;
+        }
+        .shortcut-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .shortcut-section > * {
+            margin: 0 40px; /* adjust as needed */
+        }
+        #fullscreen-button {
+            position: absolute;
+            top: -30px; /* adjust as needed */
+            right: 40px; /* adjust as needed */
+            background: #333;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <img id="logo" src="https://duoson.com/wp-content/uploads/2021/04/logo-duoson.png" alt="Duoson Logo">
+    <div id="warning-indicator"></div>
+    <p id="countdown">00:00:00</p> 
+    <div id="settings">
+        <button id="toggle-settings" onclick="toggleSettings()">+</button>
+        <button id="fullscreen-button"><i class="fas fa-expand"></i></button>
+        <div id="timer-settings">
+            <label for="hours" class="timer-label">Start timer:</label>
+            <input type="number" id="hours" placeholder="00">
+            <input type="number" id="minutes" placeholder="00">
+            <input type="number" id="seconds" placeholder="00">
+        </div>
+        <button id="start-button" onclick="startCountdown()">Start</button>
+        <button id="stop-button" onclick="stopCountdown()">Stop</button>
+        <hr>
+        <div id="appearance-settings">
+            <div>
+                <label for="font-size">Font Size:</label>
+                <input type="number" id="font-size" min="8" max="200" value="60">
+            </div>
+            <div>
+                <label for="bold">Bold:</label>
+                <input type="checkbox" id="bold">
+            </div>
+            <div>
+                <label for="color">Text Color:</label>
+                <input type="color" id="color" value="#ff0000">
+            </div>
+            <div>
+                <label for="background-color">Background Color:</label>
+                <input type="color" id="background-color" value="#000000">
+            </div>
+            <div>
+                <label for="warning-color">Warning Color:</label>
+                <input type="color" id="warning-color" value="#ff0000">
+            </div>
+        </div>    
+        <hr>
+        <div class="shortcut-section">
+            <div>
+                <p style="font-size:14px; text-align: center;"><strong>Keyboard Shortcuts:</strong></p>
+                <p style="font-size:14px; text-align: left;">
+                    Spacebar: Start<br>
+                    S: Stop<br>
+                    W: Toggles the warning indicator
+                </p>
+            </div>
+            <div>
+                <label for="keyboard-shortcuts">Enable Keyboard Shortcuts:</label>
+                <input type="checkbox" id="keyboard-shortcuts" checked>
+            </div>
+        </div>      
+    </div>
+
+    <script>
+        var countdownElement = document.getElementById('countdown');
+        var hoursElement = document.getElementById('hours');
+        var minutesElement = document.getElementById('minutes');
+        var secondsElement = document.getElementById('seconds');
+        var settingsElement = document.getElementById('settings');
+        var toggleSettingsButton = document.getElementById('toggle-settings');
+        var fontSizeElement = document.getElementById('font-size');
+        var colorElement = document.getElementById('color');
+        var backgroundColorElement = document.getElementById('background-color');
+        var boldElement = document.getElementById('bold');
+        var countdown;
+        var isTimerRunning = false; 
+        var time; 
+        var blinkInterval;
+        var startTime;
+        var targetEndTime;
+
+        hoursElement.addEventListener('change', updateTimerDisplay);
+        minutesElement.addEventListener('change', updateTimerDisplay);
+        secondsElement.addEventListener('change', updateTimerDisplay);
+
+        function updateTimerDisplay() {
+            var hours = Number(hoursElement.value);
+            var minutes = Number(minutesElement.value);
+            var seconds = Number(secondsElement.value);
+            countdownElement.innerHTML = (hours < 10 ? "0" : "") + hours + ":" + (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+        }
+
+        function toggleSettings() {
+            settingsElement.classList.toggle('show');
+            if (settingsElement.classList.contains('show')) {
+                toggleSettingsButton.textContent = '-';
+            } else {
+                toggleSettingsButton.textContent = '+';
+            }
+        }
+
+        function startCountdown() {
+            var hours = Number(hoursElement.value);
+            var minutes = Number(minutesElement.value);
+            var seconds = Number(secondsElement.value);
+            var endTime = new Date().getTime() + ((hours * 3600 + minutes * 60 + seconds) * 1000);
+            isTimerRunning = true;
+
+            countdown = setInterval(function() {
+                var now = new Date().getTime();
+                var distance = endTime - now;
+
+                if(distance <= 0) {
+                    clearInterval(countdown);
+                    countdown = null;
+                    countdownElement.innerHTML = "00:00:00";
+                } else {
+                    var remainingHours = Math.floor(distance / (1000 * 60 * 60));
+                    var remainingMinutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    var remainingSeconds = Math.floor((distance % (1000 * 60)) / 1000);
+                    countdownElement.innerHTML = (remainingHours < 10 ? "0" : "") + remainingHours + ":" + (remainingMinutes < 10 ? "0" : "") + remainingMinutes + ":" + (remainingSeconds < 10 ? "0" : "") + remainingSeconds;
+                }
+            }, 1000);
+
+            // disable the timer inputs and enable the stop button
+            hoursElement.disabled = true;
+            minutesElement.disabled = true;
+            secondsElement.disabled = true;
+            document.getElementById('stop-button').disabled = false;
+
+            settingsElement.classList.remove('show');
+            toggleSettingsButton.textContent = '+';
+        }
+
+        function stopCountdown() {
+            clearInterval(countdown); 
+            isTimerRunning = false;
+
+            // reset the timer to 0
+            hoursElement.value = 0;
+            minutesElement.value = 0;
+            secondsElement.value = 0;
+            countdownElement.innerHTML = "00:00:00";
+
+            // enable the timer inputs and disable the stop button
+            hoursElement.disabled = false;
+            minutesElement.disabled = false;
+            secondsElement.disabled = false;
+            document.getElementById('stop-button').disabled = true;
+        }
+
+        fontSizeElement.addEventListener('change', function() {
+            countdownElement.style.fontSize = this.value + 'pt';
+        });
+
+        window.onload = function() {
+            countdownElement.style.fontSize = fontSizeElement.value + 'pt';
+        }
+
+        colorElement.addEventListener('input', function() {
+            countdownElement.style.color = this.value;
+        });
+
+        boldElement.addEventListener('change', function() {
+            countdownElement.style.fontWeight = this.checked ? 'bold' : 'normal';
+        });
+
+        backgroundColorElement.addEventListener('input', function() {
+            document.body.style.backgroundColor = this.value;
+        });
+
+        window.onload = function() {
+            countdownElement.style.fontSize = fontSizeElement.value + 'pt';
+            countdownElement.style.color = colorElement.value;
+            document.body.style.backgroundColor = backgroundColorElement.value;
+        };
+
+        var warningHoursElement = document.getElementById('warning-hours');
+        var warningMinutesElement = document.getElementById('warning-minutes');
+        var warningSecondsElement = document.getElementById('warning-seconds');
+        var warningIndicatorElement = document.getElementById('warning-indicator');
+
+        // Removed checkWarningTime function and setInterval
+
+        var warningColorElement = document.getElementById('warning-color');
+
+        warningColorElement.addEventListener('input', function() {
+            document.getElementById('warning-indicator').style.backgroundColor = this.value;
+        });
+
+        // Add a flag to keep track of whether the warning indicator is showing
+        var isWarningShowing = false;
+
+        window.addEventListener('keydown', function(event) {
+            var shortcutsEnabled = document.getElementById('keyboard-shortcuts').checked;
+
+            if (event.code === 'Space') {
+                if (shortcutsEnabled) {
+                    startCountdown();
+                }
+            } else if (event.key === 's' || event.key === 'S') {
+                if (shortcutsEnabled) {
+                    stopCountdown();
+                }
+            } else if (event.key === 'w' || event.key === 'W') {
+                console.log("'W' key pressed"); // Add this line
+                if (isWarningShowing) {
+                    warningIndicatorElement.style.display = 'none';
+                    clearInterval(blinkInterval);
+                    isWarningShowing = false;
+                } else {
+                    warningIndicatorElement.style.display = 'block';
+                    clearInterval(blinkInterval);
+                    blinkInterval = setInterval(function() {
+                        warningIndicatorElement.style.opacity = (warningIndicatorElement.style.opacity == 0 ? 1 : 0);
+                    }, 1000);
+                    isWarningShowing = true;
+                }
+            }
+        });
+
+        document.getElementById('fullscreen-button').addEventListener('click', function() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen(); 
+                }
+            }
+        });
+
+</script>
+</body>
+</html>
